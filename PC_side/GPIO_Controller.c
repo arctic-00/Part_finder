@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
 #include <unistd.h>
 #include <ctype.h>
 
@@ -34,15 +35,10 @@ int main(int argc, char *argv[]) {
 
   } else pin = pin_name_to_number(argv[1]);
 
-  printf("Pin: %d\n", pin);
-
   int fd = port_setup();
 
-  if (argc == 2) {
-    toggle_pin(fd, pin);
-  }
-
-
+  if (argc == 2) toggle_pin(fd, pin);
+  if (argc == 3) write_pin(fd, pin, strtol(argv[2], NULL, 10));
 }
 
 
@@ -57,6 +53,8 @@ int pin_name_to_number(char *name) {
       return strtol(strtok(NULL, ":"), NULL, 10);
     }
   }
+
+
 
   return -1;
 }
