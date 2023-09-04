@@ -24,9 +24,6 @@
 
 #define Y_CENTRE_DISTORTION -6
 
-
-
-
 //
 //
 //  To Do: Use special character to show you are adding xServo new entry (Or just sense that u r using numbers)
@@ -47,11 +44,11 @@ void setup() {
 	Serial.begin(BAUD_RATE);
 	// pinMode(LED_BUILTIN, OUTPUT);
 	// digitalWrite(LED_BUILTIN, 0);
-
-	Serial.println(F("Part Finder\n"));
 	yServo.attach(9);
 	xServo.attach(10);
 	pinMode(6, OUTPUT);
+
+	Serial.print(F(IDENTIFYING_PHRASE));
 }  // setup()
 
 int time_to_receive_input;

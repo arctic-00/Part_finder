@@ -104,7 +104,7 @@ int set_interface_attribs(int fd) {
 // Exits program if initial message isn't correct
 // Ensures message sent by device matches IDENTIFYING_PHRASE
 void check_device(int fd) {
-  char buf[83];
+  char buf[strlen(IDENTIFYING_PHRASE) + 1];
   int rdlen;
 
   time_t time_start = time(NULL);

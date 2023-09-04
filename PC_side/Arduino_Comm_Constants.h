@@ -4,7 +4,7 @@
 
 // Time in seconds to wait for USB to give identity
 #define TIMEOUT 4
-#define IDENTIFYING_PHRASE "Part Finder\n"
+#define IDENTIFYING_PHRASE "P9;s\n"
 
 // Time before exiting program after error
 #define TIME_BEFORE_EXIT 5
