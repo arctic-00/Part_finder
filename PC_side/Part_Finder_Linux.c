@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
 
     printf("Type \"print\", \"print -a\", \"edit\"\n");
     printf("Or   \"p\",     \"pa\",       \"e\"    for database info.\n");
-    printf("Type components to find:\n");
+    printf("Type components (As a plural) to find:\n");
 
     while (1) {
         char name[MAX_COMP_LEN + 1];

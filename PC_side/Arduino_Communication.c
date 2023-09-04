@@ -10,6 +10,16 @@
 #include <time.h>
 #include <unistd.h>
 
+///////////////////////////////// Function Prototypes /////////////////////////////////
+
+// Set serial port attributes
+int set_interface_attribs(int fd);
+
+// Exits program if initial message isn't correct
+// Ensures message sent by device matches IDENTIFYING_PHRASE
+void check_device(int fd);
+
+///////////////////////////////////////////////////////////////////////////////////////
 
 // Sends a 3 element array to fd
 static int write_buff(int fd, u_int8_t buf[3]) {
@@ -38,7 +48,7 @@ int port_setup() {
   }
 
   // baudrate BAUDRATE, 8 bits, no parity, 1 stop bit
-  if (set_interface_attribs(fd, BAUDRATE) == -1) {
+  if (set_interface_attribs(fd) == -1) {
     sleep(TIME_BEFORE_EXIT);
     exit(EXIT_FAILURE);
   }
@@ -48,7 +58,9 @@ int port_setup() {
   return fd;
 }
 
-int set_interface_attribs(int fd, int speed) {
+int set_interface_attribs(int fd) {
+  int speed = BAUDRATE;
+
   struct termios tty;
 
   if (tcgetattr(fd, &tty) < 0) {

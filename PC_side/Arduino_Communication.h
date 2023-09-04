@@ -18,7 +18,6 @@
 #define CONTAINER_2_IDENTIFIER 2
 #define CONTAINER_3_IDENTIFIER 3
 
-
 typedef struct {
     int row;
     int col;
@@ -27,12 +26,6 @@ typedef struct {
 // Sets up serial port and checks it is the write device
 // returns fd
 int port_setup();
-
-int set_interface_attribs(int fd, int speed);
-
-// Exits program if initial message isn't correct
-// Ensures message sent by device matches IDENTIFYING_PHRASE
-void check_device(int fd);
 
 // Sends position to fd (i.e. arduino's serial port)
 int write_pos(int fd, u_int8_t identifier, pos component_pos);
