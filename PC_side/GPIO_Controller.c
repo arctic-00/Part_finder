@@ -37,6 +37,8 @@ int main(int argc, char *argv[]) {
 
   int fd = port_setup();
 
+  sleep(2);
+
   if (argc == 2) toggle_pin(fd, pin);
   if (argc == 3) write_pin(fd, pin, strtol(argv[2], NULL, 10));
 }
