@@ -1,3 +1,5 @@
+#include <sys/types.h>
+
 #define SERIAL_TERMINAL     "/dev/ttyUSB0"
 #define BAUDRATE            B115200
 
@@ -7,6 +9,14 @@
 
 // Time before exiting program after error
 #define TIME_BEFORE_EXIT    5
+
+#define GPIO_IN_IDENTIFIER 32
+#define GPIO_OUT_IDENTIFIER 33
+#define GPIO_TOGGLE_IDENTIFIER 34
+
+#define CONTAINER_1_IDENTIFIER 1
+#define CONTAINER_2_IDENTIFIER 2
+#define CONTAINER_3_IDENTIFIER 3
 
 
 typedef struct {
@@ -25,5 +35,16 @@ int set_interface_attribs(int fd, int speed);
 void check_device(int fd);
 
 // Sends position to fd (i.e. arduino's serial port)
-void write_pos(int fd, int identifier, pos component_pos);
+int write_pos(int fd, u_int8_t identifier, pos component_pos);
+
+// Sends value for specified pin to output, on fd (i.e. arduino's serial port)
+int write_pin(int fd, u_int8_t pin, u_int8_t value);
+
+// Toggles output for specified pin, on fd (i.e. arduino's serial port)
+int toggle_pin(int fd, u_int8_t pin);
+
+// Reads pin value, on fd (i.e. arduino's serial port)
+int read_pin(int fd, u_int8_t pin); // !!!TODO!!!
+
+
 

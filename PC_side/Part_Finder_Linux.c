@@ -174,7 +174,7 @@ pos find_pos(char *name, int fd, int num_rows, int num_col,
                 component_pos.row = i + 1;
                 component_pos.col = j + 1;
 
-                write_pos(fd, 1, component_pos);
+                write_pos(fd, CONTAINER_1_IDENTIFIER, component_pos);
             }
         }
     }
