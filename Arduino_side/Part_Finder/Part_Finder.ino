@@ -1,3 +1,5 @@
+#include "Arduino_Comm_Constants.h"
+
 #include <Servo.h>
 
 #define BAUD_RATE 115200
@@ -42,14 +44,14 @@ Servo xServo;
 byte pos[2] = { 0, 0 };
 
 void setup() {
-  Serial.begin(BAUD_RATE);
+	Serial.begin(BAUD_RATE);
 	// pinMode(LED_BUILTIN, OUTPUT);
 	// digitalWrite(LED_BUILTIN, 0);
 
-  Serial.println(F("Part Finder\n"));
-  yServo.attach(9);
-  xServo.attach(10);
-  pinMode(6, OUTPUT);
+	Serial.println(F("Part Finder\n"));
+	yServo.attach(9);
+	xServo.attach(10);
+	pinMode(6, OUTPUT);
 }  // setup()
 
 int time_to_receive_input;
@@ -57,27 +59,26 @@ int time_to_find_pos;
 
 void loop() {
 
-  while (Serial.available() == 0) {}
+	while (Serial.available() == 0) {}
 
-  byte buf[3];
+	byte buf[3];
 
-  if (Serial.readBytes(buf, 3) == 3){
-	pos[0] = buf[1];
-	pos[1] = buf[2];
+	if (Serial.readBytes(buf, 3) == 3) {
+		switch (buf[0]) {
+			case GPIO_OUT_IDENTIFIER:
+				pinMode(buf[1], OUTPUT);
+				analogWrite(buf[1], buf[2]);
+				break;
+			case CONTAINER_1_IDENTIFIER:
+				pointLaser(buf); break;
 
-	if (pos[0] >= 1 && pos[0] <= NUM_ROWS &&
-		pos[1] >= 1 && pos[1] <= NUM_COLS)
-	  	pointLaser();
-	else
-		error();
-  } else
-	error();
-
-
-
-
-
+			default: error();
+		}
+	} else error();
 }  // loop()
+
+
+
 
 void error() {
 	for (int i = 0; i < 20; i++) {
@@ -88,52 +89,57 @@ void error() {
 	}
 }
 
-void pointLaser() {
-  // Interpolate between both sides
-  int angle_y_L = map(pos[0], 1, NUM_ROWS, Y_TL, Y_BL);
-  int angle_y_R = map(pos[0], 1, NUM_ROWS, Y_TR, Y_BR);
-  // int angle_y_L = getAngle(Y, Y_TL, Y_BL);
-  // int angle_y_R = getAngle(Y, Y_T, Y_BR);
-  int angle_y = (angle_y_L * (NUM_COLS - pos[1]) + angle_y_R * pos[1]) / NUM_COLS;
+void pointLaser(byte buf[3]) {
+	pos[0] = buf[1];
+	pos[1] = buf[2];
 
-  int angle_x_T = getAngle(X, X_TL, X_TR);
-  int angle_x_B = getAngle(X, X_BL, X_BR);
-  int angle_x = (angle_x_T * (NUM_ROWS - pos[0]) + angle_x_B * pos[0]) / NUM_ROWS;
+	if (!(pos[0] >= 1 && pos[0] <= NUM_ROWS && pos[1] >= 1 && pos[1] <= NUM_COLS)) { error(); return; }
 
-  float y_fraction = float(pos[0] - 1) / (NUM_ROWS - 1);
-  angle_x += Y_CENTRE_DISTORTION * (sq(y_fraction) - y_fraction);
+	// Interpolate between both sides
+	int angle_y_L = map(pos[0], 1, NUM_ROWS, Y_TL, Y_BL);
+	int angle_y_R = map(pos[0], 1, NUM_ROWS, Y_TR, Y_BR);
+	// int angle_y_L = getAngle(Y, Y_TL, Y_BL);
+	// int angle_y_R = getAngle(Y, Y_T, Y_BR);
+	int angle_y = (angle_y_L * (NUM_COLS - pos[1]) + angle_y_R * pos[1]) / NUM_COLS;
 
-  yServo.write(angle_y);
-  xServo.write(angle_x);
-  delay(100);
-  analogWrite(6, 8);
+	int angle_x_T = getAngle(X, X_TL, X_TR);
+	int angle_x_B = getAngle(X, X_BL, X_BR);
+	int angle_x = (angle_x_T * (NUM_ROWS - pos[0]) + angle_x_B * pos[0]) / NUM_ROWS;
 
-  delay(2000);
+	float y_fraction = float(pos[0] - 1) / (NUM_ROWS - 1);
+	angle_x += Y_CENTRE_DISTORTION * (sq(y_fraction) - y_fraction);
 
-  // If there is a new position sent move to it quicker than usual
-  unsigned long init_time = millis();
-  while (millis() - init_time < 4000) {
-	if (Serial.available() >= 3)
-		break;
-	
-	delay(50);
-  }
+	yServo.write(angle_y);
+	xServo.write(angle_x);
+	delay(100);
+	analogWrite(6, 8);
 
-  analogWrite(6, 0);
+	delay(2000);
+
+	// If there is a new position sent move to it quicker than usual
+	unsigned long init_time = millis();
+	while (millis() - init_time < 4000) {
+		if (Serial.available() >= 3)
+			break;
+
+		delay(50);
+	}
+
+	analogWrite(6, 0);
 }
 
 
 int getAngle(byte axis, double initial_angle, double final_angle) {
-  byte num_segments;
-  if (axis == 0)  // If on Y-axis
-	num_segments = NUM_ROWS;
-  else  // If on X-axis
-	num_segments = NUM_COLS;
+	byte num_segments;
+	if (axis == 0)  // If on Y-axis
+		num_segments = NUM_ROWS;
+	else  // If on X-axis
+		num_segments = NUM_COLS;
 
-  double p = pos[axis] - 1;
+	double p = pos[axis] - 1;
 
-  double tan_theta = tan(radians(initial_angle)) * (1 - p / num_segments)
-                     + tan(radians(final_angle)) * (p / num_segments);
-  double theta = degrees(atan(tan_theta));
-  return byte(theta);
+	double tan_theta = tan(radians(initial_angle)) * (1 - p / num_segments)
+	                   + tan(radians(final_angle)) * (p / num_segments);
+	double theta = degrees(atan(tan_theta));
+	return byte(theta);
 }

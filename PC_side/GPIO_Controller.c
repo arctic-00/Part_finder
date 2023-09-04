@@ -54,7 +54,5 @@ int pin_name_to_number(char *name) {
     }
   }
 
-
-
   return -1;
 }

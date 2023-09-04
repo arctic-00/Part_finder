@@ -1,1 +1,0 @@
-/home/arctic/Desktop/VS_Codium (programs)/_.Projects/Part_Finder/PC_side/Arduino_Communication.h

@@ -31,6 +31,8 @@ static int write_buff(int fd, u_int8_t buf[3]) {
   }
   tcdrain(fd); // delay for output
 
+  printf("Buffer: %d %d %d\n", buf[0], buf[1], buf[2]);
+
   return EXIT_SUCCESS;
 }
 
