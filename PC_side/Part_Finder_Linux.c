@@ -110,15 +110,24 @@ char *get_database_path(char *argv[1]) {
     // Get the path to the command that was run
     // i.e. Get what was typed into the terminal with the file's name removed
     strcpy(path, argv[0]);
-    for (int i = strlen(path) - 1; i >= 0; i--) {
+    int i;
+    for (i = strlen(path) - 1; i >= 0; i--) {
         if (path[i] == '/') {
             path[i] = 0;
             break;
         }
     }
 
-    char *database_path = malloc((MAX_PATH_LEN + strlen(DATABASE_FILENAME) + 2) * sizeof(char ));
-    sprintf(database_path, "%s/%s", path, DATABASE_FILENAME);
+    // If the path given was just a command on PATH (No '/') check for a local .csv
+    char *database_path;
+    database_path = malloc((MAX_PATH_LEN + strlen(DATABASE_FILENAME) + 2) * sizeof(char ));
+    if (i == -1) {
+        getcwd(database_path, (strlen(DATABASE_FILENAME) + 1));
+        printf("CWD: \"%s\"\n", database_path);
+        sprintf(database_path, "%s/%s", database_path, DATABASE_FILENAME);
+    } else {
+        sprintf(database_path, "%s/%s", path, DATABASE_FILENAME);
+    }
 
     return database_path;
 }

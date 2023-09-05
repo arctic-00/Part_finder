@@ -94,6 +94,10 @@ void setupEeprom() {
 		for (uint8_t i = 0; i < 14 * 2; i++)
 			EEPROM.update(i, 0);
 	}
+
+	for (uint8_t i = 0; i < A0; i++) {
+		// Write all ouputs again 
+	}
 }
 
 bool isValidPin(uint8_t pin, uint8_t mode = OUTPUT) {

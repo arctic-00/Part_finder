@@ -1,5 +1,5 @@
 
-#define SERIAL_TERMINAL "/dev/ttyUSB0"
+#define SERIAL_TERMINAL "/dev/ttyUSB1"
 #define BAUDRATE B115200
 
 // Time in seconds to wait for USB to give identity
