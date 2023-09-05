@@ -16,3 +16,6 @@
 #define CONTAINER_1_IDENTIFIER 1
 #define CONTAINER_2_IDENTIFIER 2
 #define CONTAINER_3_IDENTIFIER 3
+
+// The Pin cannot be changed
+#define PIN_BLOCKED -2

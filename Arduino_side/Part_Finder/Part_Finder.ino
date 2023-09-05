@@ -34,19 +34,29 @@
 Servo yServo;
 Servo xServo;
 
+#define X_Servo_PIN 10
+#define Y_Servo_PIN 9
+#define PF_LASER_PIN 6
 
 #define X 1
 #define Y 0
 
 byte pos[2] = { 0, 0 };
 
+// Output values of different pins
+int16_t vals[14] = { 0 };
+
 void setup() {
+	vals[X_Servo_PIN] = PIN_BLOCKED;
+	vals[Y_Servo_PIN] = PIN_BLOCKED;
+	vals[PF_LASER_PIN] = PIN_BLOCKED;
+
 	Serial.begin(BAUD_RATE);
 	// pinMode(LED_BUILTIN, OUTPUT);
 	// digitalWrite(LED_BUILTIN, 0);
-	yServo.attach(9);
-	xServo.attach(10);
-	pinMode(6, OUTPUT);
+	xServo.attach(X_Servo_PIN);
+	yServo.attach(Y_Servo_PIN);
+	pinMode(PF_LASER_PIN, OUTPUT);
 
 	Serial.print(F(IDENTIFYING_PHRASE));
 }  // setup()
@@ -62,10 +72,10 @@ void loop() {
 
 	if (Serial.readBytes(buf, 3) == 3) {
 		switch (buf[0]) {
+			case GPIO_TOGGLE_IDENTIFIER:
+				gpioToggle(buf[1]); break;
 			case GPIO_OUT_IDENTIFIER:
-				pinMode(buf[1], OUTPUT);
-				analogWrite(buf[1], buf[2]);
-				break;
+				gpioOut(buf[1], buf[2]); break;
 			case CONTAINER_1_IDENTIFIER:
 				pointLaser(buf); break;
 
@@ -74,14 +84,37 @@ void loop() {
 	} else error();
 }  // loop()
 
+void gpioOut(uint8_t pin, uint8_t value) {
+	// Checks that the pin can be used as an output
+	if (pin < A0 && vals[pin] >= 0) {
+		pinMode(pin, OUTPUT);
+		analogWrite(pin, value);
+		vals[pin] = value;
+	} else {
+		error();
+	}
+}
 
+void gpioToggle(uint8_t pin) {
+	// Checks that the pin can be used as an output
+	if (pin < A0 && vals[pin] >= 0) {
+		uint8_t value = 0;
+		if (vals[pin] < 128) value = 255;
+
+		pinMode(pin, OUTPUT);
+		analogWrite(pin, value);
+		vals[pin] = value;
+	} else {
+		error();
+	}
+}
 
 
 void error() {
 	for (int i = 0; i < 20; i++) {
-		analogWrite(6, 8);
+		analogWrite(PF_LASER_PIN, 8);
 		delay(600);
-		analogWrite(6, 0);
+		analogWrite(PF_LASER_PIN, 0);
 		delay(600);
 	}
 }
@@ -109,7 +142,7 @@ void pointLaser(byte buf[3]) {
 	yServo.write(angle_y);
 	xServo.write(angle_x);
 	delay(100);
-	analogWrite(6, 8);
+	analogWrite(PF_LASER_PIN, 8);
 
 	delay(2000);
 
@@ -122,7 +155,7 @@ void pointLaser(byte buf[3]) {
 		delay(50);
 	}
 
-	analogWrite(6, 0);
+	analogWrite(PF_LASER_PIN, 0);
 }
 
 
