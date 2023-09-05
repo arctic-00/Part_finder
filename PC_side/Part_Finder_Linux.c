@@ -57,8 +57,8 @@ int main(int argc, char *argv[]) {
     char *database_path = get_database_path(argv);
     FILE *fp = get_database_fp(database_path);
 
-    char components[5][6][2][MAX_COMP_LEN+1];
-    load_components(fp, 5, 6, components);
+    char components[C_1_NUM_ROWS][C_1_NUM_COLS][2][MAX_COMP_LEN+1];
+    load_components(fp, C_1_NUM_ROWS, C_1_NUM_COLS, components);
     fclose(fp);
 
     int fd = port_setup();
@@ -80,12 +80,12 @@ int main(int argc, char *argv[]) {
             edit_database(database_path);
         } else if (strcmp(name, "print_-a") == 0 || 
                    strcmp(name, "pa") == 0) {
-            print_sorted(5 * 6 * 2, &components[0][0][0]);
+            print_sorted(C_1_NUM_ROWS * C_1_NUM_COLS * 2, &components[0][0][0]);
         } else if (strcmp(name, "print") == 0 ||
                    strcmp(name, "p") == 0) {
-            print_database(5, 6, components);
+            print_database(C_1_NUM_ROWS, C_1_NUM_COLS, components);
         } else {
-            find_pos(name, fd, 5, 6, components);
+            find_pos(name, fd, C_1_NUM_ROWS, C_1_NUM_COLS, components);
         }
     }
 
@@ -122,9 +122,9 @@ char *get_database_path(char *argv[1]) {
     char *database_path;
     database_path = malloc((MAX_PATH_LEN + strlen(DATABASE_FILENAME) + 2) * sizeof(char ));
     if (i == -1) {
-        getcwd(database_path, (strlen(DATABASE_FILENAME) + 1));
-        printf("CWD: \"%s\"\n", database_path);
-        sprintf(database_path, "%s/%s", database_path, DATABASE_FILENAME);
+        char *cwd = malloc(strlen(DATABASE_FILENAME) + 1);
+        getcwd(cwd, (strlen(DATABASE_FILENAME) + 1));
+        sprintf(database_path, "%s/%s", cwd, DATABASE_FILENAME);
     } else {
         sprintf(database_path, "%s/%s", path, DATABASE_FILENAME);
     }

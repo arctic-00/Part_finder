@@ -1,6 +1,10 @@
 
-#define SERIAL_TERMINAL "/dev/ttyUSB1"
+#define SERIAL_TERMINAL "/dev/ttyUSB0"
 #define BAUDRATE B115200
+
+// Container 1 size
+#define C_1_NUM_ROWS 5
+#define C_1_NUM_COLS 6
 
 // Time in seconds to wait for USB to give identity
 #define TIMEOUT 4
