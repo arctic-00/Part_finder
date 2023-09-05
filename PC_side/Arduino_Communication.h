@@ -1,8 +1,8 @@
 #include "Arduino_Comm_Constants.h"
 #include <sys/types.h>
 typedef struct {
-    int row;
-    int col;
+  int row;
+  int col;
 } pos;
 
 // Sets up serial port and checks it is the write device

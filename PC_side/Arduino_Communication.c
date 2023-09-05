@@ -38,7 +38,7 @@ static int write_buff(int fd, u_int8_t buf[3]) {
 // returns fd
 int port_setup() {
   char *portname = SERIAL_TERMINAL;
-  int fd;
+  int   fd;
 
   fd = open(portname, O_RDWR | O_NOCTTY | O_SYNC);
   if (fd < 0) {
@@ -88,9 +88,9 @@ int set_interface_attribs(int fd) {
 
   tty.c_oflag &= ~OPOST;
 
-  tty.c_cc[VEOL] = 0;
+  tty.c_cc[VEOL]  = 0;
   tty.c_cc[VEOL2] = 0;
-  tty.c_cc[VEOF] = 0x04;
+  tty.c_cc[VEOF]  = 0x04;
 
   if (tcsetattr(fd, TCSANOW, &tty) != 0) {
     printf("Error from tcsetattr: %s\n", strerror(errno));
@@ -103,7 +103,7 @@ int set_interface_attribs(int fd) {
 // Ensures message sent by device matches IDENTIFYING_PHRASE
 void check_device(int fd) {
   char buf[strlen(IDENTIFYING_PHRASE) + 1];
-  int rdlen;
+  int  rdlen;
 
   time_t time_start = time(NULL);
   time_t time_passed;
@@ -167,5 +167,5 @@ int read_pin(int fd, u_int8_t pin) {
   write_buff(fd, buf);
 
   // TODO
-  return -1; 
+  return -1;
 }

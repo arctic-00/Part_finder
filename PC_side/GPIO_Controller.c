@@ -22,10 +22,7 @@ int pin_name_to_number(char *name);
 int main(int argc, char *argv[]) {
   if (argc != 2 && argc != 3) {
     fprintf(stderr, "Usage:\n");
-    fprintf(stderr,
-            "%s <GPIO Pin or Name of item> <Optional: Value (Otherwise value "
-            "is toggled)>\n",
-            argv[0]);
+    fprintf(stderr, "%s <GPIO Pin or Name of item> <Optional: Value (Otherwise value is toggled)>\n", argv[0]);
     return EXIT_FAILURE;
   }
 
