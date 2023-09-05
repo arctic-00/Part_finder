@@ -1,11 +1,18 @@
+
 #include "Arduino_Comm_Constants.h"
 
 #include <Servo.h>
+#include <EEPROM.h>
+
+// Set this false after you have loaded this program once
+#define FIRST_RUN false
+
 
 #define BAUD_RATE 115200
 
 #define NUM_ROWS 5
 #define NUM_COLS 6
+
 
 
 // Angles to point at top left corner
@@ -41,15 +48,12 @@ Servo xServo;
 #define X 1
 #define Y 0
 
+
+
 byte pos[2] = { 0, 0 };
 
-// Output values of different pins
-int16_t vals[14] = { 0 };
-
 void setup() {
-	vals[X_Servo_PIN] = PIN_BLOCKED;
-	vals[Y_Servo_PIN] = PIN_BLOCKED;
-	vals[PF_LASER_PIN] = PIN_BLOCKED;
+	setupEeprom();
 
 	Serial.begin(BAUD_RATE);
 	// pinMode(LED_BUILTIN, OUTPUT);
@@ -84,12 +88,37 @@ void loop() {
 	} else error();
 }  // loop()
 
+void setupEeprom() {
+	// Only needs to be run once on the arduino
+	if (FIRST_RUN) {
+		for (uint8_t i = 0; i < 14 * 2; i++)
+			EEPROM.update(i, 0);
+	}
+}
+
+bool isValidPin(uint8_t pin, uint8_t mode = OUTPUT) {
+	if (mode == OUTPUT && pin >= A0) return false;
+	
+	// Protect serial rx/tx and part finder pins from being changed
+	// An address of 2 refers to pin 1, an address of 14 refers to pin 7
+	switch (pin) {
+		case 0:		case 1:
+		case X_Servo_PIN:
+		case Y_Servo_PIN:
+		case PF_LASER_PIN:
+		return false;
+	}
+
+	return true;
+}
+
 void gpioOut(uint8_t pin, uint8_t value) {
 	// Checks that the pin can be used as an output
-	if (pin < A0 && vals[pin] >= 0) {
+	if (isValidPin(pin)) {
 		pinMode(pin, OUTPUT);
 		analogWrite(pin, value);
-		vals[pin] = value;
+		EEPROM.update(pin, value);
+		EEPROM.put(pin * sizeof(value), value);
 	} else {
 		error();
 	}
@@ -97,13 +126,13 @@ void gpioOut(uint8_t pin, uint8_t value) {
 
 void gpioToggle(uint8_t pin) {
 	// Checks that the pin can be used as an output
-	if (pin < A0 && vals[pin] >= 0) {
+	if (isValidPin(pin)) {
 		uint8_t value = 0;
-		if (vals[pin] < 128) value = 255;
+		if (EEPROM[pin] < 128) value = 255;
 
 		pinMode(pin, OUTPUT);
 		analogWrite(pin, value);
-		vals[pin] = value;
+		EEPROM.update(pin, value);
 	} else {
 		error();
 	}
