@@ -6,6 +6,8 @@
 #define C_1_NUM_ROWS 5
 #define C_1_NUM_COLS 6
 
+////////////////////////// CONSTANTS SHOULD NOT NEED TO BE CHANGED AFTER THIS POINT //////////////////////////
+
 // Time in seconds to wait for USB to give identity
 #define TIMEOUT            4
 #define IDENTIFYING_PHRASE "P9;s\n"
